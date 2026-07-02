@@ -13,16 +13,28 @@ public class Data {
 	private Attribute explanatorySet[];
 	private ContinuousAttribute classAttribute;
 	
-	public Data(String fileName)throws FileNotFoundException{
+	public Data(String fileName)throws TrainingDataException{
 		
 		File inFile = new File (fileName);
 
-		Scanner sc = new Scanner (inFile);
-	    String line = sc.nextLine();
+		Scanner sc;
 
-	    if(!line.contains("@schema")){
+		try {
+			sc=new Scanner (inFile);
+		} catch (FileNotFoundException e) {
+			throw new TrainingDataException(e.toString());
+		}
+
+	    if (!sc.hasNextLine()) {
 			sc.close();
-	    	throw new RuntimeException("Errore nello schema");
+			throw new TrainingDataException("Training set vuoto");
+		}
+
+		String line = sc.nextLine();
+
+		if (!line.trim().startsWith("@schema")) {
+			sc.close();
+			throw new TrainingDataException("Schema mancante");
 		}
 	
 	    String s[]=line.split(" ");
@@ -49,13 +61,24 @@ public class Data {
 	    	  
 	    }
 		      
+		if (classAttribute == null){
+			sc.close();
+			throw new TrainingDataException("Variabile target numerica mancante");
+		}
+
 		//avvalorare numero di esempi
 	    //@data 167
 	    numberOfExamples=Integer.parseInt(line.split(" ")[1]);
+
+		if (numberOfExamples <= 0){
+			sc.close();
+			throw new TrainingDataException("Training set vuoto");
+		}
 	      
 	    //popolare data
 	    data=new Object[numberOfExamples][explanatorySet.length+1];
 	    short iRow=0;
+
 	    while (sc.hasNextLine())
 	    {
 	    	line = sc.nextLine();
@@ -63,7 +86,15 @@ public class Data {
 	    	s=line.split(","); //E,E,5,4, 0.28125095
 	    	for(short jColumn=0;jColumn<s.length-1;jColumn++)
 	    		data[iRow][jColumn]=s[jColumn];
-	    	data[iRow][s.length-1]=Double.parseDouble(s[s.length-1]);
+
+
+			try{
+				data[iRow][s.length - 1] = Double.parseDouble(s[s.length - 1]);
+			}catch(NumberFormatException e){
+				sc.close();
+				throw new TrainingDataException("La variabile target deve essere numerica");
+			}
+
 	    	iRow++;
 	    	  
 	    }
@@ -188,7 +219,7 @@ public class Data {
 		
 	}
 	
-	public static void main(String args[])throws FileNotFoundException{
+	public static void main(String args[])throws TrainingDataException{
 		Data trainingSet=new Data("servo.dat");
 		System.out.println(trainingSet);
 		
