@@ -1,0 +1,16 @@
+# File compilati Java
+*.class
+
+# Cartelle di compilazione
+bin/
+out/
+build/
+target/
+
+# File degli IDE
+.vscode/
+.idea/
+*.iml
+
+# File temporanei
+*.log
