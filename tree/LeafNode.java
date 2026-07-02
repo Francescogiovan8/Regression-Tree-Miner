@@ -1,3 +1,7 @@
+package tree;
+
+import data.Data;
+
 class LeafNode extends Node {
     private Double predictedClassValue=0.0;
 

@@ -1,3 +1,7 @@
+package tree;
+
+import data.Data;
+
 abstract class Node{
     private static int idNodeCount=0; 
     private int idNode; 

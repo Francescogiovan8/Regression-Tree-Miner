@@ -1,10 +1,15 @@
-class RegressionTree {
+package tree;
+
+import data.Data;
+import data.DiscreteAttribute;
+
+public class RegressionTree {
 	private Node root;
 	private RegressionTree[] childTree;
 
 	RegressionTree(){}
 
-	RegressionTree(Data trainingSet){
+	public RegressionTree(Data trainingSet){
 			
 		learnTree(trainingSet,0,trainingSet.getNumberOfExamples()-1,trainingSet.getNumberOfExamples()*10/100);
 	}
@@ -57,7 +62,7 @@ class RegressionTree {
 			
 
 		
-	void printTree(){
+	public void printTree(){
 		System.out.println("********* TREE **********\n");
 		System.out.println(toString());
 		System.out.println("*************************\n");
@@ -77,7 +82,7 @@ class RegressionTree {
 		return tree;
 	}
 
-	void printRules(){
+	public void printRules(){
     	System.out.println("********* RULES **********");
     	printRules("");
 		System.out.println("*************************\n");
