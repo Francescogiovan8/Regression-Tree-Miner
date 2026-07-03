@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Data {
 	
 	private Object data [][];
 	private int numberOfExamples;
-	private Attribute explanatorySet[];
+	private List<Attribute> explanatorySet = new LinkedList<>();
 	private ContinuousAttribute classAttribute;
 	
 	public Data(String fileName)throws TrainingDataException{
@@ -41,8 +44,7 @@ public class Data {
 
 		//popolare explanatory Set 
 	    //@schema 4
-			
-		explanatorySet = new Attribute[Integer.parseInt(s[1])];
+
 		short iAttribute=0;
 	    line = sc.nextLine();
 	    while(!line.contains("@data")){
@@ -51,7 +53,13 @@ public class Data {
 	    	{ 	// aggiungo l'attributo allo spazio descrittivo
 		    	//@desc motor discrete A,B,C,D,E  
 		    	String discreteValues[]=s[2].split(",");
-		    	explanatorySet[iAttribute] = new DiscreteAttribute(s[1],iAttribute, discreteValues);
+
+				Set<String> values = new TreeSet<>();
+				for (String value : discreteValues) {
+					values.add(value);
+				}
+
+				explanatorySet.add(new DiscreteAttribute(s[1], iAttribute, values));
 		    }
 	    	else if(s[0].equals("@target"))
 	    		classAttribute=new ContinuousAttribute(s[1], iAttribute);
@@ -76,7 +84,7 @@ public class Data {
 		}
 	      
 	    //popolare data
-	    data=new Object[numberOfExamples][explanatorySet.length+1];
+	    data=new Object[numberOfExamples][explanatorySet.size()+1];
 	    short iRow=0;
 
 	    while (sc.hasNextLine())
@@ -107,11 +115,11 @@ public class Data {
 	}
 
 	public int getNumberOfExplanatoryAttributes(){
-		return explanatorySet.length;
+		return explanatorySet.size();
 	}
 
 	public Double getClassValue(int exampleIndex){
-		return (Double) data[exampleIndex][explanatorySet.length];
+		return (Double) data[exampleIndex][explanatorySet.size()];
 	}
 
 	public Object getExplanatoryValue(int exampleIndex, int attributeIndex){
@@ -119,7 +127,7 @@ public class Data {
 	}
 
 	public Attribute getExplanatoryAttribute(int index){
-		return explanatorySet[index];
+		return explanatorySet.get(index);
 	}
 
 	public ContinuousAttribute getClassAttribute(){
@@ -129,10 +137,10 @@ public class Data {
 	public String toString(){
 		String value="";
 		for(int i=0;i<numberOfExamples;i++){
-			for(int j=0;j<explanatorySet.length;j++)
+			for(int j=0;j<explanatorySet.size();j++)
 				value+=data[i][j]+",";
 			
-			value+=data[i][explanatorySet.length]+"\n";
+			value+=data[i][explanatorySet.size()]+"\n";
 		}
 		return value;
 		

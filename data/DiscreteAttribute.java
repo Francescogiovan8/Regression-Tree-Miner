@@ -1,18 +1,24 @@
 package data;
 
-public class DiscreteAttribute extends Attribute{
-    private String[] values;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
-    public DiscreteAttribute(String name, int index, String[] values){
-        super(name, index);
-        this.values=values;        
-    }
+public class DiscreteAttribute extends Attribute implements Iterable<String>{
+	private Set<String> values=new TreeSet<>(); // order by asc
 
-    public int getNumberOfDistinctValues(){
-        return values.length;
-    }
+	public DiscreteAttribute(String name, int index, Set<String> values) {
+		super(name,index);
+		this.values=values;
+	}
 
-    public String getValue(int i){
-        return values[i];
-    }
+	public int getNumberOfDistinctValues(){
+		return values.size();
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return values.iterator();
+	}
+
 }

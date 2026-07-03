@@ -4,6 +4,8 @@ import utility.Keyboard;
 import data.Data;
 import data.DiscreteAttribute;
 
+import java.util.TreeSet;
+
 public class RegressionTree {
 	private Node root;
 	private RegressionTree[] childTree;
@@ -20,23 +22,18 @@ public class RegressionTree {
     	return numberOfExamples <= numberOfExamplesPerLeaf;
 	}
 
-	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end){
+	SplitNode determineBestSplitNode(Data trainingSet, int begin, int end) {
+		TreeSet<SplitNode> splitNodes = new TreeSet<>();
 
-    	SplitNode bestSplitNode = null;
-
-    	for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
-        	DiscreteAttribute attribute=(DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
-			SplitNode currentSplitNode=new DiscreteNode(trainingSet, begin, end, attribute);
-
-        	if (bestSplitNode == null || currentSplitNode.getVariance() < bestSplitNode.getVariance()) {
-				bestSplitNode = currentSplitNode;
-        	}
-        }
-
-        trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
-
-        return bestSplitNode;
-    }
+		for (int i = 0; i < trainingSet.getNumberOfExplanatoryAttributes(); i++) {
+			DiscreteAttribute attribute = (DiscreteAttribute) trainingSet.getExplanatoryAttribute(i);
+			SplitNode currentSplitNode = new DiscreteNode(trainingSet, begin, end, attribute);
+			splitNodes.add(currentSplitNode);
+		}
+		SplitNode bestSplitNode = splitNodes.first();
+		trainingSet.sort(bestSplitNode.getAttribute(), begin, end);
+		return bestSplitNode;
+	}
 
 
 	void learnTree(Data trainingSet,int begin, int end,int numberOfExamplesPerLeaf){
@@ -60,9 +57,7 @@ public class RegressionTree {
 				
 		}
 	}
-			
 
-		
 	public void printTree(){
 		System.out.println("********* TREE **********\n");
 		System.out.println(toString());
