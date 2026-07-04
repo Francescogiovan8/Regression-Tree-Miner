@@ -46,28 +46,27 @@ public class Data {
 	    //@schema 4
 
 		short iAttribute = 0;
-	    line = sc.nextLine();
-	    while (!line.contains("@data")) {
-			s = line.split(" ");
+		line = sc.nextLine();
+		while (!line.contains("@data")) {
+			s = line.trim().split("\\s+");
 			if (s[0].equals("@desc")) {
-				// aggiungo l'attributo allo spazio descrittivo
-				//@desc motor discrete A,B,C,D,E
-				String[] discreteValues = s[2].split(",");
-
-				Set<String> values = new TreeSet<>();
-				for (String value : discreteValues) {
-					values.add(value);
+				if (s.length == 3) {
+					String[] discreteValues = s[2].split(",");
+					Set<String> values = new TreeSet<>();
+					for (String value : discreteValues) {
+						values.add(value);
+					}
+					explanatorySet.add(new DiscreteAttribute(s[1], iAttribute, values));
+				} else if (s.length == 2) {
+					explanatorySet.add(new ContinuousAttribute(s[1], iAttribute));
 				}
-
-				explanatorySet.add(new DiscreteAttribute(s[1], iAttribute, values));
-		    } else if (s[0].equals("@target")) {
-	    		classAttribute=new ContinuousAttribute(s[1], iAttribute);
+			} else if (s[0].equals("@target")) {
+				classAttribute = new ContinuousAttribute(s[1], iAttribute);
 			}
 
-	    	iAttribute++;
-	    	line = sc.nextLine();
-
-	    }
+			iAttribute++;
+			line = sc.nextLine();
+		}
 
 		if (classAttribute == null){
 			sc.close();
@@ -89,14 +88,24 @@ public class Data {
 
 	    while (sc.hasNextLine()) {
 	    	line = sc.nextLine();
-	    	// assumo che attributi siano tutti discreti
+			// acquisisco i valori degli attributi discreti e continui
 			s = line.split(","); //E,E,5,4, 0.28125095
 			for (short jColumn = 0; jColumn < s.length - 1; jColumn++) {
-				data[iRow][jColumn] = s[jColumn];
+				Attribute attribute = explanatorySet.get(jColumn);
+				try {
+					if (attribute instanceof DiscreteAttribute) {
+						data[iRow][jColumn] = s[jColumn].trim();
+					} else {
+						data[iRow][jColumn] = Double.parseDouble(s[jColumn].trim());
+					}
+				} catch (NumberFormatException e) {
+					sc.close();
+					throw new TrainingDataException("Gli attributi continui devono essere numerici");
+				}
 			}
 
 			try {
-				data[iRow][s.length - 1] = Double.parseDouble(s[s.length - 1]);
+				data[iRow][s.length - 1] = Double.parseDouble(s[s.length - 1].trim());
 			} catch (NumberFormatException e) {
 				sc.close();
 				throw new TrainingDataException("La variabile target deve essere numerica");
@@ -133,6 +142,7 @@ public class Data {
 		return classAttribute;
 	}
 
+	@Override
 	public String toString() {
 		String value = "";
 		for (int i = 0; i < numberOfExamples; i++) {
@@ -197,6 +207,33 @@ public class Data {
 
 	}
 
+	private int partition(ContinuousAttribute attribute, int inf, int sup) {
+		int i = inf;
+		int j = sup;
+		int med = (inf + sup) / 2;
+
+		Double x = (Double) getExplanatoryValue(med, attribute.getIndex());
+		swap(inf, med);
+		while (true) {
+			while (i <= sup && ((Double) getExplanatoryValue(i, attribute.getIndex())).compareTo(x) <= 0) {
+				i++;
+			}
+
+			while (((Double) getExplanatoryValue(j, attribute.getIndex())).compareTo(x) > 0) {
+				j--;
+			}
+
+			if (i < j) {
+				swap(i, j);
+			} else {
+				break;
+			}
+		}
+
+		swap(inf, j);
+		return j;
+	}
+
 	/*
 	 * Algoritmo quicksort per l'ordinamento di un array di interi A
 	 * usando come relazione d'ordine totale "<="
@@ -205,7 +242,13 @@ public class Data {
 	private void quicksort(Attribute attribute, int inf, int sup) {
 		if (sup >= inf) {
 			int pos;
-			pos = partition((DiscreteAttribute)attribute, inf, sup);
+
+			if (attribute instanceof DiscreteAttribute) {
+				pos = partition((DiscreteAttribute) attribute, inf, sup);
+			} else {
+				pos = partition((ContinuousAttribute) attribute, inf, sup);
+			}
+
 			if ((pos - inf) < (sup - pos + 1)) {
 				quicksort(attribute, inf, pos - 1);
 				quicksort(attribute, pos + 1, sup);

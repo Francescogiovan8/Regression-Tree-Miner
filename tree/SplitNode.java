@@ -3,13 +3,14 @@ package tree;
 import data.Attribute;
 import data.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 abstract class SplitNode extends Node implements Comparable<SplitNode> {
 
 	// Classe che colelzione informazioni descrittive dello split
-	class SplitInfo {
+	class SplitInfo implements Serializable {
 		Object splitValue;
 		int beginIndex;
 		int endIndex;
