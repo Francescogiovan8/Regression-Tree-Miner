@@ -169,11 +169,11 @@ public class Keyboard {
 		String token = getNextToken();
 		boolean bool;
 		try {
-			if (token.toLowerCase().equals("true"))
+			if (token.toLowerCase().equals("true")) {
 				bool = true;
-			else if (token.toLowerCase().equals("false"))
+			} else if (token.toLowerCase().equals("false")) {
 				bool = false;
-			else {
+			} else {
 				error("Error reading boolean data, false value returned.");
 				bool = false;
 			}
@@ -193,8 +193,9 @@ public class Keyboard {
 		try {
 			if (token.length() > 1) {
 				current_token = token.substring(1, token.length());
-			} else
+			} else {
 				current_token = null;
+			}
 			value = token.charAt(0);
 		} catch (Exception exception) {
 			error("Error reading char data, MIN_VALUE value returned.");
@@ -241,7 +242,7 @@ public class Keyboard {
 		String token = getNextToken();
 		float value;
 		try {
-			value = (new Float(token)).floatValue();
+			value = Float.parseFloat(token);
 		} catch (Exception exception) {
 			error("Error reading float data, NaN value returned.");
 			value = Float.NaN;
@@ -256,7 +257,7 @@ public class Keyboard {
 		String token = getNextToken();
 		double value;
 		try {
-			value = (new Double(token)).doubleValue();
+			value = Double.parseDouble(token);
 		} catch (Exception exception) {
 			error("Error reading double data, NaN value returned.");
 			value = Double.NaN;

@@ -27,12 +27,12 @@ class MainTest {
 
 		System.out.println("Starting learning phase!");
 
-		RegressionTree tree=new RegressionTree(trainingSet);
-		
+		RegressionTree tree = new RegressionTree(trainingSet);
+
 		tree.printRules();
-		
+
 		tree.printTree();
-		
+
 		char answer;
 
 		do {

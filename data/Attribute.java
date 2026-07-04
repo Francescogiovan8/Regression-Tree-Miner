@@ -1,19 +1,19 @@
 package data;
 
-public abstract class Attribute{
+public abstract class Attribute {
     private String name;
     private int index;
 
-    protected Attribute(String name, int index){
-        this.name=name;
-        this.index=index;
+    protected Attribute(String name, int index) {
+        this.name = name;
+        this.index = index;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
-    public int getIndex(){
+    public int getIndex() {
         return index;
     }
 
