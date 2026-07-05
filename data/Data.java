@@ -2,120 +2,84 @@ package data;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Scanner;
-
-import java.util.Set;
-import java.util.TreeSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
+
+import database.Column;
+import database.DatabaseConnectionException;
+import database.DbAccess;
+import database.EmptySetException;
+import database.Example;
+import database.TableData;
+import database.TableSchema;
 
 public class Data {
 
-	private Object data [][];
+	private List<Example> data = new ArrayList<Example>();
 	private int numberOfExamples;
 	private List<Attribute> explanatorySet = new LinkedList<>();
 	private ContinuousAttribute classAttribute;
 
-	public Data(String fileName) throws TrainingDataException {
-
-		File inFile = new File(fileName);
-
-		Scanner sc;
+	public Data(String tableName) throws TrainingDataException {
+		DbAccess db = new DbAccess();
 
 		try {
-			sc = new Scanner(inFile);
-		} catch (FileNotFoundException e) {
-			throw new TrainingDataException(e.toString());
-		}
+			db.initConnection();
 
-	    if (!sc.hasNextLine()) {
-			sc.close();
-			throw new TrainingDataException("Training set vuoto");
-		}
+			TableSchema tableSchema = new TableSchema(db, tableName);
 
-		String line = sc.nextLine();
+			int numberOfAttributes = tableSchema.getNumberOfAttributes();
 
-		if (!line.trim().startsWith("@schema")) {
-			sc.close();
-			throw new TrainingDataException("Schema mancante");
-		}
+			if (numberOfAttributes < 2) {
+				throw new TrainingDataException("La tabella deve contenere almeno due colonne");
+			}
 
-	    String[] s = line.split(" ");
+			TableData tableData = new TableData(db);
 
-		//popolare explanatory Set
-	    //@schema 4
+			for (int i = 0; i < numberOfAttributes - 1; i++) {
+				Column column = tableSchema.getColumn(i);
 
-		short iAttribute = 0;
-		line = sc.nextLine();
-		while (!line.contains("@data")) {
-			s = line.trim().split("\\s+");
-			if (s[0].equals("@desc")) {
-				if (s.length == 3) {
-					String[] discreteValues = s[2].split(",");
+				if (column.isNumber()) {
+					explanatorySet.add(new ContinuousAttribute(column.getColumnName(), i));
+				} else {
+					Set<Object> distinctValues = tableData.getDistinctColumnValues(tableName, column);
+
 					Set<String> values = new TreeSet<>();
-					for (String value : discreteValues) {
-						values.add(value);
+
+					for (Object value : distinctValues) {
+						values.add((String) value);
 					}
-					explanatorySet.add(new DiscreteAttribute(s[1], iAttribute, values));
-				} else if (s.length == 2) {
-					explanatorySet.add(new ContinuousAttribute(s[1], iAttribute));
-				}
-			} else if (s[0].equals("@target")) {
-				classAttribute = new ContinuousAttribute(s[1], iAttribute);
-			}
 
-			iAttribute++;
-			line = sc.nextLine();
-		}
-
-		if (classAttribute == null){
-			sc.close();
-			throw new TrainingDataException("Variabile target numerica mancante");
-		}
-
-		//avvalorare numero di esempi
-	    //@data 167
-	    numberOfExamples=Integer.parseInt(line.split(" ")[1]);
-
-		if (numberOfExamples <= 0){
-			sc.close();
-			throw new TrainingDataException("Training set vuoto");
-		}
-
-	    //popolare data
-	    data = new Object[numberOfExamples][explanatorySet.size() + 1];
-	    short iRow = 0;
-
-	    while (sc.hasNextLine()) {
-	    	line = sc.nextLine();
-			// acquisisco i valori degli attributi discreti e continui
-			s = line.split(","); //E,E,5,4, 0.28125095
-			for (short jColumn = 0; jColumn < s.length - 1; jColumn++) {
-				Attribute attribute = explanatorySet.get(jColumn);
-				try {
-					if (attribute instanceof DiscreteAttribute) {
-						data[iRow][jColumn] = s[jColumn].trim();
-					} else {
-						data[iRow][jColumn] = Double.parseDouble(s[jColumn].trim());
-					}
-				} catch (NumberFormatException e) {
-					sc.close();
-					throw new TrainingDataException("Gli attributi continui devono essere numerici");
+					explanatorySet.add(new DiscreteAttribute(column.getColumnName(), i, values));
 				}
 			}
 
-			try {
-				data[iRow][s.length - 1] = Double.parseDouble(s[s.length - 1].trim());
-			} catch (NumberFormatException e) {
-				sc.close();
+			Column targetColumn = tableSchema.getColumn(numberOfAttributes - 1);
+
+			if (!targetColumn.isNumber()) {
 				throw new TrainingDataException("La variabile target deve essere numerica");
 			}
 
-	    	iRow++;
+			classAttribute = new ContinuousAttribute(targetColumn.getColumnName(), numberOfAttributes - 1);
 
-	    }
-		sc.close();
+			data.addAll(tableData.getTransazioni(tableName));
 
+			numberOfExamples = data.size();
+
+		} catch (DatabaseConnectionException e) {
+			throw new TrainingDataException(e.toString());
+		} catch (SQLException e) {
+			throw new TrainingDataException(e.toString());
+		} catch (EmptySetException e) {
+			throw new TrainingDataException(e.toString());
+		} finally {
+			db.closeConnection();
+		}
 	}
 
 	public int  getNumberOfExamples() {
@@ -127,11 +91,11 @@ public class Data {
 	}
 
 	public Double getClassValue(int exampleIndex) {
-		return (Double) data[exampleIndex][explanatorySet.size()];
+		return (Double) data.get(exampleIndex).get(explanatorySet.size());
 	}
 
 	public Object getExplanatoryValue(int exampleIndex, int attributeIndex) {
-		return data[exampleIndex][attributeIndex];
+		return data.get(exampleIndex).get(attributeIndex);
 	}
 
 	public Attribute getExplanatoryAttribute(int index) {
@@ -147,10 +111,10 @@ public class Data {
 		String value = "";
 		for (int i = 0; i < numberOfExamples; i++) {
 			for (int j = 0; j < explanatorySet.size(); j++) {
-				value += data[i][j] + ",";
+				value += data.get(i).get(j) + ",";
 			}
 
-			value += data[i][explanatorySet.size()] + "\n";
+			value += data.get(i).get(explanatorySet.size()) + "\n";
 		}
 		return value;
 
@@ -162,14 +126,10 @@ public class Data {
 	}
 
 	// scambio esempio i con esempi oj
-	private void swap(int i,int j) {
-		Object temp;
-		for (int k = 0; k < getNumberOfExplanatoryAttributes() + 1; k++) {
-			temp = data[i][k];
-			data[i][k] = data[j][k];
-			data[j][k] = temp;
-		}
-
+	private void swap(int i, int j) {
+		Example temp = data.get(i);
+		data.set(i, data.get(j));
+		data.set(j, temp);
 	}
 
 	/*
@@ -264,7 +224,7 @@ public class Data {
 	}
 
 	public static void main(String args[]) throws TrainingDataException {
-		Data trainingSet=new Data("servo.dat");
+		Data trainingSet=new Data("provaC");
 		System.out.println(trainingSet);
 		for (int jColumn = 0; jColumn < trainingSet.getNumberOfExplanatoryAttributes(); jColumn++) {
 			System.out.println("ORDER BY "+trainingSet.getExplanatoryAttribute(jColumn));
