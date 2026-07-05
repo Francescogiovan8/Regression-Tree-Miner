@@ -35,6 +35,10 @@ public class Data {
 
 			int numberOfAttributes = tableSchema.getNumberOfAttributes();
 
+			if (numberOfAttributes == 0) {
+				throw new TrainingDataException("La tabella " + tableName + " non esiste");
+			}
+
 			if (numberOfAttributes < 2) {
 				throw new TrainingDataException("La tabella deve contenere almeno due colonne");
 			}

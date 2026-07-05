@@ -1,6 +1,7 @@
 package tree;
 
-import utility.Keyboard;
+import server.UnknownValueException;
+
 import data.Data;
 import data.Attribute;
 import data.ContinuousAttribute;
@@ -131,17 +132,22 @@ public class RegressionTree implements Serializable{
     	}
     }
 
-	public Double predictClass() throws UnknownValueException {
-		if (root instanceof LeafNode) return ((LeafNode) root).getPredictedClassValue();
-		else {
-			int risp;
-
-			System.out.println(((SplitNode) root).formulateQuery());
-			risp = Keyboard.readInt();
-
-			if (risp < 0 || risp >= root.getNumberOfChildren()) throw new UnknownValueException("The answer should be an integer between 0 and " + (root.getNumberOfChildren() - 1) + "!");
-			else return childTree[risp].predictClass();
+	public Double predictClass(ObjectInputStream in, ObjectOutputStream out) throws UnknownValueException, IOException, ClassNotFoundException {
+		if (root instanceof LeafNode) {
+			return ((LeafNode) root).getPredictedClassValue();
 		}
+
+		out.writeObject("QUERY");
+		out.writeObject(((SplitNode) root).formulateQuery());
+		out.flush();
+
+		int answer = (Integer) in.readObject();
+
+		if (answer < 0 || answer >= root.getNumberOfChildren()) {
+			throw new UnknownValueException("The answer should be an integer between 0 and " + (root.getNumberOfChildren() - 1) + "!");
+		}
+
+		return childTree[answer].predictClass(in, out);
 	}
 
 	public void salva(String nomeFile) throws FileNotFoundException, IOException {
