@@ -28,7 +28,7 @@ public class MainTest {
 		ObjectOutputStream out=null;
 		ObjectInputStream in=null;
 		try {
-			socket = new Socket(args[0], new Integer(args[1]).intValue());
+			socket = new Socket(args[0], Integer.parseInt(args[1]));
 			System.out.println(socket);		
 			out = new ObjectOutputStream(socket.getOutputStream());
 			in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
