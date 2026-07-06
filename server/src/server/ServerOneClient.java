@@ -51,7 +51,7 @@ class ServerOneClient extends Thread {
 
                     case 1:
                         if (trainingSet == null) {
-                            out.writeObject("Training set non caricato");
+                            out.writeObject("Nessun training set caricato. Carica prima una tabella dal database.");
                         } else {
                             try {
                                 tree = new RegressionTree(trainingSet);
@@ -80,7 +80,7 @@ class ServerOneClient extends Thread {
 
                     case 3:
                         if (tree == null) {
-                            out.writeObject("Regression tree non caricato");
+                            out.writeObject("Nessun albero di regressione caricato. Apprendi o carica prima un modello.");
                         } else {
                             try {
                                 Double predictedClass = tree.predictClass(in, out);
@@ -95,7 +95,7 @@ class ServerOneClient extends Thread {
                         break;
 
                     default:
-                        out.writeObject("Richiesta non valida");
+                        out.writeObject("Richiesta non valida.");
                         out.flush();
                 }
             }

@@ -144,7 +144,7 @@ public class RegressionTree implements Serializable{
 		int answer = (Integer) in.readObject();
 
 		if (answer < 0 || answer >= root.getNumberOfChildren()) {
-			throw new UnknownValueException("The answer should be an integer between 0 and " + (root.getNumberOfChildren() - 1) + "!");
+			throw new UnknownValueException("La risposta deve essere un numero intero compreso tra 0 e " + (root.getNumberOfChildren() - 1) + "!");
 		}
 
 		return childTree[answer].predictClass(in, out);

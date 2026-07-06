@@ -45,25 +45,51 @@ public class MainTest {
 		
 		int decision=0;
 		do{
-		
-			System.out.println("Learn Regression Tree from data [1]");
-			System.out.println("Load Regression Tree from archive [2]");
+			System.out.println("\n===== Regression Tree Miner =====");
+			System.out.println("1) Apprendi un nuovo albero da una tabella del database");
+			System.out.println("2) Carica un albero già salvato da archivio");
+			System.out.print("Scelta: ");
 			decision=Keyboard.readInt();
 		}while(!(decision==1) && !(decision ==2));
 		
 		String tableName="";
-		System.out.println("File name:");
+		if(decision==1)
+			System.out.println("\nInserisci il nome della tabella del database:");
+		else
+			System.out.println("\nInserisci il nome dell'archivio senza estensione .dmp:");
 		tableName=Keyboard.readString();
+
 		try{
 		
-		if(decision==1)
-		{
-			System.out.println("Starting data acquisition phase!");
+			if(decision==1) {
+				System.out.println("\n[1/3] Caricamento del training set dal database...");
+				
+				
+				
+				out.writeObject(0);
+				out.writeObject(tableName);
+				answer=in.readObject().toString();
+				if(!answer.equals("OK")){
+					System.out.println(answer);
+					return;
+				}
+					
+				
+				
 			
+				System.out.println("[2/3] Apprendimento dell'albero di regressione...");
+				out.writeObject(1);
+				
 			
+			}
+			else
+			{
+				System.out.println("\nCaricamento dell'albero di regressione dall'archivio...");
+				out.writeObject(2);
+				out.writeObject(tableName);
+				
+			}
 			
-			out.writeObject(0);
-			out.writeObject(tableName);
 			answer=in.readObject().toString();
 			if(!answer.equals("OK")){
 				System.out.println(answer);
@@ -72,61 +98,42 @@ public class MainTest {
 				
 			
 			
-		
-			System.out.println("Starting learning phase!");
-			out.writeObject(1);
+			// .........
 			
-		
-		}
-		else
-		{
-			out.writeObject(2);
-			out.writeObject(tableName);
+			char risp='y';
 			
-		}
-		
-		answer=in.readObject().toString();
-		if(!answer.equals("OK")){
-			System.out.println(answer);
-			return;
-		}
-			
-		
-		
-		// .........
-		
-		char risp='y';
-		
-		do{
-			out.writeObject(3);
-			
-			System.out.println("Starting prediction phase!");
-			answer=in.readObject().toString();
-		
-			
-			while(answer.equals("QUERY")){
-				// Formualting query, reading answer
-				answer=in.readObject().toString();
-				System.out.println(answer);
-				int path=Keyboard.readInt();
-				out.writeObject(path);
-				answer=in.readObject().toString();
-			}
-		
-			if(answer.equals("OK"))
-			{ // Reading prediction
-				answer=in.readObject().toString();
-				System.out.println("Predicted class:"+answer);
+			do{
+				out.writeObject(3);
 				
-			}
-			else //Printing error message
-				System.out.println(answer);
+				System.out.println("\n--- Predizione guidata ---");
+				System.out.println("Scegli il ramo digitando il numero corrispondente:");
+				answer=in.readObject().toString();
 			
-		
-			System.out.println("Would you repeat ? (y/n)");
-			risp=Keyboard.readChar();
 				
-		}while (Character.toUpperCase(risp)=='Y');
+				while(answer.equals("QUERY")){
+					// Formualting query, reading answer
+					answer=in.readObject().toString();
+					System.out.println(answer);
+					System.out.print("Scelta: ");
+					int path=Keyboard.readInt();
+					out.writeObject(path);
+					answer=in.readObject().toString();
+				}
+			
+				if(answer.equals("OK"))
+				{ // Reading prediction
+					answer=in.readObject().toString();
+					System.out.println("Classe predetta: "+ answer);
+					
+				}
+				else //Printing error message
+					System.out.println(answer);
+				
+			
+				System.out.println("\nVuoi effettuare un'altra predizione? (s/n)");
+				risp=Keyboard.readChar();
+								
+			}while (Character.toUpperCase(risp)=='S' || Character.toUpperCase(risp)=='Y');
 		
 		}
 		catch(IOException | ClassNotFoundException e){
