@@ -15,3 +15,7 @@ target/
 # File temporanei
 *.log
 *.dmp
+
+# Estensione Bot Telegram
+estensioneBotTelegram/target/
+estensioneBotTelegram/out/
