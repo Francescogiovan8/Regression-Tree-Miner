@@ -17,5 +17,5 @@ target/
 *.dmp
 
 # Estensione Bot Telegram
-estensioneBotTelegram/target/
-estensioneBotTelegram/out/
+estensioneTelegramBot/target/
+estensioneTelegramBot/out/

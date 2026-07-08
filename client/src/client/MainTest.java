@@ -9,11 +9,39 @@ import java.net.UnknownHostException;
 
 import utility.Keyboard;
 
-
+/**
+ * Classe principale del client console del progetto Regression Tree Miner.
+ *
+ * <p>Il client permette all'utente di comunicare con il server tramite socket.
+ * Attraverso il menu testuale è possibile apprendere un nuovo albero di regressione
+ * da una tabella del database oppure caricare un albero già serializzato da archivio.
+ * Dopo il caricamento o l'apprendimento dell'albero, il client avvia una predizione
+ * guidata interagendo con il server.</p>
+ *
+ * <p>La classe rappresenta il punto di ingresso del client da terminale.</p>
+ */
 public class MainTest {
 
 	/**
-	 * @param args
+	 * Punto di ingresso del client console.
+	 *
+	 * <p>Il metodo riceve da linea di comando l'indirizzo e la porta del server,
+	 * apre una connessione socket e gestisce l'interazione testuale con l'utente.
+	 * Il client invia al server i codici operazione previsti dal protocollo
+	 * dell'applicazione:</p>
+	 *
+	 * <ul>
+	 *   <li>{@code 0}: caricamento del training set da database;</li>
+	 *   <li>{@code 1}: apprendimento dell'albero di regressione;</li>
+	 *   <li>{@code 2}: caricamento di un albero da archivio;</li>
+	 *   <li>{@code 3}: avvio della predizione guidata.</li>
+	 * </ul>
+	 *
+	 * <p>Durante la predizione, il client riceve dal server le domande relative
+	 * ai nodi dell'albero e invia la scelta del ramo selezionato dall'utente.</p>
+	 *
+	 * @param args argomenti da linea di comando; {@code args[0]} contiene l'indirizzo
+	 * del server e {@code args[1]} contiene la porta del server
 	 */
 	public static void main(String[] args){
 		
@@ -95,10 +123,6 @@ public class MainTest {
 				System.out.println(answer);
 				return;
 			}
-				
-			
-			
-			// .........
 			
 			char risp='y';
 			

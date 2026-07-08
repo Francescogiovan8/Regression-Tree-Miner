@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"bot","l":"ClientSession"},{"p":"bot","l":"Main"},{"p":"bot","l":"ClientSession.ServerResponse"},{"p":"bot","l":"TelegramRegressionTreeBot"}];updateSearchResults();
