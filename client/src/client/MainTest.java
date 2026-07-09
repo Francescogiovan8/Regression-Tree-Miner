@@ -78,6 +78,10 @@ public class MainTest {
 			System.out.println("2) Carica un albero già salvato da archivio");
 			System.out.print("Scelta: ");
 			decision=Keyboard.readInt();
+
+			if (decision != 1 && decision != 2) {
+				System.out.println("Scelta non valida. Inserire 1 oppure 2.");
+			}
 		}while(!(decision==1) && !(decision ==2));
 		
 		String tableName="";
