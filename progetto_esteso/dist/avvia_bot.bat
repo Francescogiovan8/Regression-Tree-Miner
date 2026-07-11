@@ -1,4 +1,15 @@
 @echo off
 cd /d "%~dp0"
-java -jar bot.jar 8563223022:AAEf3TWxxMgn65qk0xC6AJnwqDg8e9_ap_M 127.0.0.1 8080
+
+set TOKEN_FILE=telegram_token.txt
+
+if exist "%TOKEN_FILE%" (
+    set /p BOT_TOKEN=<"%TOKEN_FILE%"
+)
+
+if "%BOT_TOKEN%"=="" (
+    set /p BOT_TOKEN=Inserisci token Telegram: 
+)
+
+java -jar bot.jar "%BOT_TOKEN%" 127.0.0.1 8080
 pause

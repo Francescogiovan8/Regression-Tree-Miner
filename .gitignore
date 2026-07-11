@@ -6,16 +6,22 @@ bin/
 out/
 build/
 target/
+**/bin/
+**/out/
+**/build/
+**/target/
 
-# File degli IDE
+# File temporanei e generati
+*.log
+*.tmp
+*.dmp
+
+# File degli IDE/editor
 .vscode/
 .idea/
 *.iml
 
-# File temporanei
-*.log
-*.dmp
-
-# Estensione Bot Telegram
-estensioneTelegramBot/target/
-estensioneTelegramBot/out/
+# Token e credenziali locali
+telegram_token.txt
+.env
+*.env
