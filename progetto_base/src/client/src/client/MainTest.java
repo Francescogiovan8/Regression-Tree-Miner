@@ -46,20 +46,23 @@ public class MainTest {
 	public static void main(String[] args){
 		
 		InetAddress addr;
+
 		try {
 			addr = InetAddress.getByName(args[0]);
 		} catch (UnknownHostException e) {
 			System.out.println(e.toString());
 			return;
 		}
+
 		Socket socket=null;
 		ObjectOutputStream out=null;
 		ObjectInputStream in=null;
+
 		try {
 			socket = new Socket(args[0], Integer.parseInt(args[1]));
 			System.out.println(socket);		
 			out = new ObjectOutputStream(socket.getOutputStream());
-			in = new ObjectInputStream(socket.getInputStream());	; // stream con richieste del client
+			in = new ObjectInputStream(socket.getInputStream()); // stream con richieste del client
 			
 		}  catch (IOException e) {
 			System.out.println(e.toString());
@@ -128,6 +131,14 @@ public class MainTest {
 				return;
 			}
 			
+			if(decision==1) {
+				System.out.println("[3/3] Albero appreso e salvato.");
+			}
+			else {
+				System.out.println("Albero caricato correttamente.");
+			}
+
+
 			char risp='y';
 			
 			do{
